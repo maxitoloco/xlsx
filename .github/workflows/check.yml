@@ -1,70 +1,62 @@
-# This workflow runs for every pull request to lint and test the proposed changes.
+# Runs on every pull request to verify build, tests, and lint.
 
-name: Check
+name: CI
 
 on:
     pull_request:
+        branches:
+            - master
+        types:
+            - opened
+            - synchronize
+            - reopened
+
+concurrency:
+    group: ci-${{ github.workflow }}-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
 
 jobs:
-    # NPM install is done in a separate job and cached to speed up the following jobs.
-    build_and_test:
-        name: Build & Test
-        if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
-        runs-on: ${{ matrix.os }}
+    test:
+        name: Test (Node ${{ matrix.node-version }})
+        if: ${{ !contains(github.event.pull_request.title, '[skip ci]') }}
+        runs-on: ubuntu-latest
 
         strategy:
+            fail-fast: false
             matrix:
-                os: [ubuntu-latest]
                 node-version: [16, 18, 20]
 
         steps:
-            -
-                uses: actions/checkout@v4
-            -
-                name: Use Node.js ${{ matrix.node-version }}
-                uses: actions/setup-node@v4
-                with:
-                    node-version: ${{ matrix.node-version }}
-            -
-                name: Cache Node Modules
-                if: ${{ matrix.node-version == 20 }}
-                uses: actions/cache@v4
-                with:
-                    path: |
-                        node_modules
-                        build
-                    key: cache-${{ github.run_id }}-v20
-            -
-                name: Install Dependencies
-                run: npm install
-            -
-                name: Add localhost-test to Linux hosts file
-                if: ${{ matrix.os == 'ubuntu-latest' }}
-                run: sudo echo "127.0.0.1 localhost-test" | sudo tee -a /etc/hosts
-            -
-                name: Run Tests
-                run: npm test
+            - uses: actions/checkout@v4
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run tests
+              run: npm test
 
     lint:
         name: Lint
-        needs: [build_and_test]
+        if: ${{ !contains(github.event.pull_request.title, '[skip ci]') }}
         runs-on: ubuntu-latest
 
         steps:
-            -
-                uses: actions/checkout@v4
-            -
-                name: Use Node.js 20
-                uses: actions/setup-node@v4
-                with:
-                    node-version: 20
-            -
-                name: Load Cache
-                uses: actions/cache@v4
-                with:
-                    path: |
-                        node_modules
-                        build
-                    key: cache-${{ github.run_id }}-v20
-            -
-                run: npm run lint
+            - uses: actions/checkout@v4
+
+            - name: Use Node.js 20
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run ESLint
+              run: npm run lint
