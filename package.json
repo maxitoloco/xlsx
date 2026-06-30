@@ -34,7 +34,7 @@
         "start": "npm run build && node dist/index.js",
         "build": "npm run clean && tsc",
         "test": "npm run build && mocha --require babel-core/register --recursive",
-        "test-cov": "npm run build && babel-node node_modules/isparta/bin/isparta cover --report html --report text node_modules/.bin/_mocha",
+        "test-cov": "npm run build && nyc mocha --require babel-core/register --recursive",
         "prepare": "npm run build",
         "clean": "rimraf dist",
         "lint": "eslint src test"
@@ -60,12 +60,36 @@
         "eslint-plugin-promise": "^3.6.0",
         "eslint-plugin-react": "7.4.0",
         "glob": "^7.2.0",
-        "isparta": "^4.0.0",
         "mocha": "^8.3.2",
+        "nyc": "^15.1.0",
         "rimraf": "^3.0.2",
         "sinon": "^4.0.1",
         "sinon-stub-promise": "^4.0.0",
         "typescript": "^5.4.5",
         "unzipper": "^0.10.11"
+    },
+    "nyc": {
+        "require": [
+            "babel-core/register"
+        ],
+        "include": [
+            "src/**/*.js"
+        ],
+        "exclude": [
+            "test/**",
+            "dist/**"
+        ],
+        "reporter": [
+            "text",
+            "lcov",
+            "json-summary"
+        ],
+        "all": true,
+        "cache": false,
+        "check-coverage": true,
+        "lines": 90,
+        "statements": 90,
+        "branches": 80,
+        "functions": 75
     }
 }
