@@ -1,0 +1,40 @@
+---
+description: JavaScript and ESLint conventions for src/ and test/
+globs: "{src,test}/**/*.js"
+---
+
+# JavaScript conventions
+
+Follow `.eslintrc` (airbnb-base) and `.editorconfig`.
+
+## Style
+
+- 4-space indent, LF, max line length 150
+- ES6 modules in `src/`: `import`/`export`, `export default` for primary classes
+- PascalCase classes, camelCase functions and variables
+- JSDoc on public classes and constructor `options`
+
+## Patterns
+
+- Stream classes extend `Transform` with `{ objectMode: true }`
+- Respect backpressure: check `.write()` return value and listen for `drain`
+- Template modules are pure functions; re-export from `src/templates/index.js`
+- Route all user string content through `sanitize()` from `utils.js`
+
+## Example
+
+```javascript
+export default class XLSXRowTransform extends Transform {
+    constructor(shouldFormat) {
+        super({ objectMode: true });
+        this.shouldFormat = shouldFormat;
+    }
+
+    _transform(row, encoding, callback) {
+        if (!Array.isArray(row)) return callback();
+        callback(null, Row(this.rowCount++, row, this.shouldFormat));
+    }
+}
+```
+
+Do not introduce TypeScript source files unless the project migrates; `tsc` only compiles existing JS to `dist/`.

@@ -1,0 +1,31 @@
+---
+description: Core context for xlsx-write-stream — scope, layout, and agent boundaries
+alwaysApply: true
+---
+
+# xlsx-write-stream
+
+Streaming XLSX writer (Node.js `Transform` + `archiver`). CSV replacement for large exports — not a full spreadsheet library.
+
+## Layout
+
+- `src/XLSXTransformStream.js` — main export; ZIP assembly
+- `src/XLSXRowTransform.js` — array rows → sheet XML
+- `src/templates/` — OOXML fragments and cell/row builders
+- `src/utils.js` — `sanitize`, `getCellId`, format helpers
+- `test/*.spec.js` — Mocha specs; `test/test.xlsx` is the snapshot fixture
+- `dist/` — tsc output; never edit by hand
+
+## Before finishing
+
+```bash
+npm test && npm run lint
+```
+
+## Boundaries
+
+- **Always:** minimal diffs; preserve streaming/backpressure; sanitize string cell values
+- **Ask first:** new dependencies, API breaks, OOXML features beyond CSV replacement
+- **Never:** hand-edit `dist/`; skip tests for behavior changes
+
+Full agent guide: `AGENTS.md`
