@@ -1,0 +1,34 @@
+---
+description: Git workflow, CI, and npm release process for this repository
+---
+
+# Git and release
+
+## Workflow
+
+- Target `master` via pull request; CI runs build, test (Node 16/18/20), and lint
+- Commit messages: clear and descriptive; add `[skip ci]` only when intentionally skipping release/CI
+
+## Release (from CONTRIBUTING.md)
+
+| Trigger | npm tag |
+|---------|---------|
+| Push to `master` | `beta` (automatic) |
+| GitHub Release published | `latest` (manual) |
+
+## Changelog
+
+Update `CHANGELOG.md` for user-visible changes using the existing format:
+
+```
+1.0.x / YYYY-MM-DD
+==================
+- Description of change
+```
+
+## Agent checklist for PRs
+
+1. `npm test` and `npm run lint` pass
+2. `CHANGELOG.md` updated if behavior or API changed
+3. No manual edits under `dist/`
+4. No unintended scope creep (formatting, charts, etc.)

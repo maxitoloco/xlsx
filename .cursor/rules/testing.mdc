@@ -1,0 +1,28 @@
+---
+description: Mocha testing conventions for xlsx-write-stream
+globs: "test/**/*.js"
+---
+
+# Testing
+
+## Stack
+
+- Mocha + Chai; Sinon when stubbing is needed
+- File naming: `<module>.spec.js` alongside or under `test/`
+- Babel register required — use ES6 `import` like existing specs
+
+## Practices
+
+- Test behavior, not implementation details
+- Integration tests: pipe through `XLSXTransformStream`, unzip with `unzipper`, compare file buffers to `test/test.xlsx`
+- Use `Readable` in `objectMode` with row arrays as input chunks
+- Dev dependencies in tests are allowed (`import/no-extraneous-dependencies` override)
+
+## Commands
+
+```bash
+npm test        # build + run all specs
+npm run test-cov  # optional coverage
+```
+
+Add or update specs when changing stream behavior, cell types, or XML output.
